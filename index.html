@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LeafCure | AI for Healthy Crops</title>
+  <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+  <script src="https://unpkg.com/feather-icons"></script>
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+  <style>
+    :root {
+      --primary: #3B82F6;
+      --primary-dark: #2563EB;
+      --secondary: #10B981;
+      --secondary-dark: #059669;
+      --bg-light: #ffffff;
+      --bg-dark: #1E293B;
+      --text-light: #1F2937;
+      --text-dark: #F1F5F9;
+      --card-light: rgba(255, 255, 255, 0.8);
+      --card-dark: rgba(30, 41, 59, 0.8);
+    }
+
+    .dark {
+      --bg-color: var(--bg-dark);
+      --text-color: var(--text-dark);
+      --card-bg: var(--card-dark);
+      --border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .light {
+      --bg-color: var(--bg-light);
+      --text-color: var(--text-light);
+      --card-bg: var(--card-light);
+      --border-color: rgba(0, 0, 0, 0.1);
+    }
+
+    .gradient-text {
+      background: linear-gradient(90deg, #10B981 0%, #3B82F6 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .glass-card {
+      background: var(--card-bg);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid var(--border-color);
+    }
+
+    .step-circle {
+      width: 60px;
+      height: 60px;
+      border: 2px solid #10B981;
+    }
+
+    .feature-icon {
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, #10B981 0%, #3B82F6 100%);
+    }
+
+    .result-meter {
+      height: 8px;
+      background: linear-gradient(90deg, #10B981 0%, #3B82F6 100%);
+    }
+
+    /* Fix for camera modal */
+    .camera-modal {
+      display: none;
+      position: fixed;
+      z-index: 9999;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0,0,0,0.8);
+    }
+
+    .modal-content {
+      position: relative;
+      background-color: #fff;
+      margin: 5% auto;
+      padding: 20px;
+      border-radius: 8px;
+      width: 90%;
+      max-width: 600px;
+    }
+
+    .close-btn {
+      position: absolute;
+      right: 20px;
+      top: 20px;
+      color: #aaa;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .close-btn:hover {
+      color: #333;
+    }
+
+    /* Fix for image preview */
+    #previewContainer {
+      display: none;
+    }
+
+    /* Smooth scrolling */
+    html {
+      scroll-behavior: smooth;
+    }
+  </style>
+</head>
+
+<body class="font-sans antialiased text-[var(--text-color)] bg-[var(--bg-color)] transition-colors duration-300">
+  <!-- Navigation -->
+  <nav class="fixed w-full z-50 bg-[var(--card-bg)] backdrop-blur-sm border-b border-[var(--border-color)]">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between h-16 items-center">
+        <div class="flex items-center">
+          <div class="flex-shrink-0 flex items-center">
+            <i data-feather="leaf" class="text-emerald-500 w-8 h-8"></i>
+            <span class="ml-2 text-xl font-bold">LeafCure</span>
+          </div>
+        </div>
+        <div class="hidden md:block">
+          <div class="ml-10 flex items-center space-x-8">
+            <a href="#technology"
+              class="text-gray-500 hover:text-emerald-500 dark:hover:text-blue-400 px-3 py-2 text-sm font-medium transition-colors">Technology</a>
+            <a href="#how-it-works"
+              class="text-gray-500 hover:text-emerald-500 dark:hover:text-blue-400 px-3 py-2 text-sm font-medium transition-colors">How
+              It Works</a>
+            <a href="#features"
+              class="text-gray-500 hover:text-emerald-500 dark:hover:text-blue-400 px-3 py-2 text-sm font-medium transition-colors">Features</a>
+            <a href="#impact"
+              class="text-gray-500 hover:text-emerald-500 dark:hover:text-blue-400 px-3 py-2 text-sm font-medium transition-colors">Impact</a>
+            <a href="#contact"
+              class="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-full text-sm font-medium transition duration-300">Try
+              LeafCure</a>
+          </div>
+        </div>
+        <div class="-mr-2 flex md:hidden">
+          <button type="button" id="mobileMenuButton"
+            class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-emerald-500">
+            <i data-feather="menu" class="h-6 w-6"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+    <!-- Mobile menu -->
+    <div id="mobileMenu" class="hidden md:hidden bg-[var(--card-bg)] border-t border-[var(--border-color)]">
+      <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+        <a href="#technology"
+          class="block px-3 py-2 text-base font-medium text-gray-500 hover:text-emerald-500 dark:hover:text-blue-400">Technology</a>
+        <a href="#how-it-works"
+          class="block px-3 py-2 text-base font-medium text-gray-500 hover:text-emerald-500 dark:hover:text-blue-400">How
+          It Works</a>
+        <a href="#features"
+          class="block px-3 py-2 text-base font-medium text-gray-500 hover:text-emerald-500 dark:hover:text-blue-400">Features</a>
+        <a href="#impact"
+          class="block px-3 py-2 text-base font-medium text-gray-500 hover:text-emerald-500 dark:hover:text-blue-400">Impact</a>
+        <a href="#contact"
+          class="block px-3 py-2 text-base font-medium text-white bg-emerald-500 hover:bg-emerald-600 rounded-md">Contact</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="relative pt-24 pb-12 md:pt-32 md:pb-20">
+    <!-- Background Image -->
+    <div class="absolute inset-0">
+      <img class="w-full h-full object-cover"
+        src="https://imageio.forbes.com/specials-images/imageserve/658f074cd18ab2cbde024703/Smart-farming-holding-young-plant--Smart-farming-and-precision-agriculture-4-0-/960x0.jpg?format=jpg&width=960"
+        alt="Healthy crops with AI">
+      <!-- Dark overlay for contrast -->
+      <div class="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-transparent"></div>
+    </div>
+
+    <!-- Content -->
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex flex-col items-center justify-center text-center">
+        <!-- Text Box -->
+        <div
+          class="bg-white/80 dark:bg-gray-900/80 backdrop-blur-md rounded-xl shadow-xl p-8 max-w-3xl transition-colors duration-500">
+          <h1 class="text-4xl tracking-tight font-extrabold text-gray-900 dark:text-white sm:text-5xl md:text-6xl">
+            <span class="block">AI for</span>
+            <span
+              class="block bg-gradient-to-r from-blue-400 to-emerald-400 dark:from-blue-300 dark:to-emerald-300 text-transparent bg-clip-text">
+              Healthy Crops
+            </span>
+          </h1>
+          <div class="mt-2 text-sm text-gray-600 dark:text-gray-300">
+            Made by <span class="font-medium text-red-500">TaraXAI</span>
+          </div>
+          <p class="mt-4 text-base text-gray-700 dark:text-gray-300 sm:mt-6 sm:text-lg md:text-xl">
+            LeafCure is a breakthrough in agricultural intelligence — instantly detecting plant diseases and
+            identifying fruit varieties with cutting-edge AI.
+          </p>
+          <div class="mt-8">
+            <a href="#how-it-works"
+              class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-full shadow-sm text-white bg-emerald-500 hover:bg-emerald-600 transition duration-300">
+              Try LeafCure
+              <i data-feather="arrow-right" class="ml-2 w-4 h-4"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Technology Section -->
+  <section id="technology" class="py-12 md:py-20 bg-gray-50 dark:bg-gray-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="lg:text-center">
+        <h2 class="text-base text-emerald-500 font-semibold tracking-wide uppercase">Technology</h2>
+        <p class="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-gray-900 dark:text-white sm:text-4xl">
+          Scientific Precision Meets AI
+        </p>
+        <p class="mt-4 max-w-2xl text-xl text-gray-500 dark:text-gray-300 lg:mx-auto">
+          Our deep learning models are trained on thousands of annotated plant images for unmatched accuracy.
+        </p>
+      </div>
+
+      <div class="mt-16">
+        <div class="grid grid-cols-1 gap-8 md:grid-cols-2">
+          <div class="glass-card rounded-2xl p-8" data-aos="fade-up">
+            <div class="flex items-center">
+              <div class="flex-shrink-0 bg-emerald-100 rounded-lg p-3">
+                <i data-feather="cpu" class="w-6 h-6 text-emerald-600"></i>
+              </div>
+              <div class="ml-4">
+                <h3 class="text-lg font-medium text-gray-900 dark:text-white">Deep Learning Foundation</h3>
+                <p class="mt-2 text-gray-500 dark:text-gray-400">
+                  Convolutional neural networks trained on diverse agricultural datasets for robust performance across
+                  crops and conditions.
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class="glass-card rounded-2xl p-8" data-aos="fade-up" data-aos-delay="100">
+            <div class="flex items-center">
+              <div class="flex-shrink-0 bg-emerald-100 rounded-lg p-3">
+                <i data-feather="zap" class="w-6 h-6 text-emerald-600"></i>
+              </div>
+              <div class="ml-4">
+                <h3 class="text-lg font-medium text-gray-900 dark:text-white">Real-Time Processing</h3>
+                <p class="mt-2 text-gray-500 dark:text-gray-400">
+                  Optimized algorithms deliver results in seconds, enabling immediate action for farmers in the field.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-16">
+        <div class="relative rounded-xl overflow-hidden">
+          <div class="absolute inset-0 bg-gradient-to-r from-emerald-400 to-blue-500 opacity-20"></div>
+          <div class="relative bg-white dark:bg-gray-800 rounded-xl overflow-hidden">
+            <div class="lg:grid lg:grid-cols-2">
+              <div class="p-8 sm:p-12 lg:py-16 lg:pr-0">
+                <div class="max-w-lg mx-auto lg:mx-0">
+                  <h2 class="text-2xl font-bold text-gray-900 dark:text-white sm:text-3xl">
+                    <span class="block">Continuous Learning</span>
+                  </h2>
+                  <p class="mt-4 text-gray-600 dark:text-gray-300">
+                    Every scan makes our models smarter 🤖—constantly learning new diseases and crop varieties through federated learning.
+                  </p>
+                  <div class="mt-8">
+                    <a href="#contact"
+                      class="inline-flex items-center px-5 py-3 border border-transparent text-base font-medium rounded-full shadow-sm text-white bg-emerald-500 hover:bg-emerald-600 transition duration-300">
+                      Learn More
+                    </a>
+                  </div>
+                </div>
+              </div>
+              <div class="relative h-64 sm:h-96 lg:h-full">
+                <img class="absolute inset-0 w-full h-full object-cover"
+                  src="https://d15shllkswkct0.cloudfront.net/wp-content/blogs.dir/1/files/2024/11/googlebiglsleep.png" alt="AI processing plant data">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How It Works Section -->
+  <section id="how-it-works" class="py-12 md:py-20 bg-white dark:bg-gray-900">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="lg:text-center">
+        <h2 class="text-base text-emerald-500 font-semibold tracking-wide uppercase">Process</h2>
+        <p
+          class="mt-2 text-3xl leading-8 font-extrabold tracking-tight bg-gradient-to-r from-purple-500 to-pink-500 text-transparent bg-clip-text sm:text-4xl">
+          How LeafCure Works
+        </p>
+        <p
+          class="mt-4 max-w-2xl text-xl bg-gradient-to-r from-purple-400 to-pink-400 text-transparent bg-clip-text lg:mx-auto animate-pulse">
+          Three simple steps to healthier crops and better harvests.
+        </p>
+      </div>
+
+      <div class="mt-16">
+        <div class="grid grid-cols-1 gap-8 md:grid-cols-3">
+          <!-- Step 1 -->
+          <div class="flex flex-col items-center text-center" data-aos="fade-up">
+            <div class="step-circle rounded-full flex items-center justify-center mb-6">
+              <span class="text-emerald-500 text-xl font-bold">1</span>
+            </div>
+            <h3 class="text-lg font-medium bg-gradient-to-r from-emerald-500 to-blue-500 text-transparent bg-clip-text">
+              Capture Image</h3>
+            <p class="mt-2 text-gray-500 dark:text-gray-400">
+              Use your device's camera to snap a photo of a leaf or fruit.
+            </p>
+          </div>
+
+          <!-- Step 2 -->
+          <div class="flex flex-col items-center text-center" data-aos="fade-up" data-aos-delay="100">
+            <div class="step-circle rounded-full flex items-center justify-center mb-6">
+              <span class="text-emerald-500 text-xl font-bold">2</span>
+            </div>
+            <h3 class="text-lg font-medium bg-gradient-to-r from-emerald-500 to-blue-500 text-transparent bg-clip-text">
+              AI Analysis</h3>
+            <p class="mt-2 text-gray-500 dark:text-gray-400">
+              Our deep learning models process the image in real-time.
+            </p>
+          </div>
+
+          <!-- Step 3 -->
+          <div class="flex flex-col items-center text-center" data-aos="fade-up" data-aos-delay="200">
+            <div class="step-circle rounded-full flex items-center justify-center mb-6">
+              <span class="text-emerald-500 text-xl font-bold">3</span>
+            </div>
+            <h3 class="text-lg font-medium bg-gradient-to-r from-emerald-500 to-blue-500 text-transparent bg-clip-text">
+              Get Results</h3>
+            <p class="mt-2 text-gray-500 dark:text-gray-400">
+              Receive instant diagnosis and actionable recommendations.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Upload/Camera Options -->
+      <div class="mt-16 text-center">
+        <h3
+          class="text-2xl font-bold text-gray-900 dark:text-white mb-6 bg-gradient-to-r from-blue-500 to-emerald-500 dark:from-blue-400 dark:to-emerald-400 text-transparent bg-clip-text">
+          Analyze Your Plants Now</h3>
+        <p class="text-lg text-gray-600 dark:text-gray-300 mb-8 max-w-2xl mx-auto">
+          Get instant AI diagnosis by uploading an image or using your camera
+        </p>
+        <div class="flex flex-col items-center space-y-6">
+          <div class="relative group w-full max-w-md">
+            <button id="uploadBtn"
+              class="relative z-10 w-full px-8 py-4 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform group-hover:-translate-y-1">
+              <i data-feather="upload" class="w-5 h-5 mr-2 inline"></i>
+              Upload Image
+              <input type="file" id="fileInput" accept="image/*" capture="environment"
+                class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+            </button>
+            <div
+              class="absolute -inset-1 bg-gradient-to-r from-purple-400 to-blue-400 rounded-xl blur opacity-25 group-hover:opacity-50 transition duration-300">
+            </div>
+          </div>
+          <div class="text-gray-500 dark:text-gray-400 font-medium">OR</div>
+          <div class="relative group w-full max-w-md">
+            <button id="openCameraBtn"
+              class="relative z-10 w-full px-8 py-4 bg-gradient-to-r from-blue-500 to-emerald-500 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform group-hover:-translate-y-1">
+              <i data-feather="camera" class="w-5 h-5 mr-2 inline"></i>
+              Open Camera
+            </button>
+            <div
+              class="absolute -inset-1 bg-gradient-to-r from-blue-400 to-emerald-400 rounded-xl blur opacity-25 group-hover:opacity-50 transition duration-300">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Camera Preview Modal -->
+      <div id="cameraModal" class="camera-modal">
+        <div class="modal-content">
+          <span class="close-btn">&times;</span>
+          <div class="relative h-96">
+            <video id="video" autoplay playsinline class="w-full h-full object-cover rounded-lg"></video>
+            <button id="captureBtn"
+              class="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-white rounded-full p-4 shadow-lg hover:bg-gray-100 transition duration-300">
+              <i data-feather="circle" class="w-8 h-8 text-emerald-500"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Result Display (Hidden by default) -->
+      <!-- Result Display (Hidden by default) -->
+<div id="resultDisplay"
+  class="hidden mt-16 bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden border border-gray-100 dark:border-gray-700"
+  data-aos="zoom-in">
+  <div class="grid grid-cols-1 lg:grid-cols-2">
+    <div class="p-8 sm:p-12">
+      <h3 class="text-2xl font-bold text-gray-900 dark:text-white">Analysis Results</h3>
+      <div class="mt-6">
+        <!-- Dynamic Results Here -->
+        <h4 id="resultCrop" class="text-lg font-medium text-gray-900 dark:text-white"></h4>
+        <p id="resultDisease" class="mt-1 text-gray-600 dark:text-gray-300"></p>
+        <div class="mt-4">
+          <div class="flex justify-between text-sm text-gray-500 dark:text-gray-400">
+            <span>Confidence</span>
+            <span id="confidencePercent"></span>
+          </div>
+          <div class="mt-1 w-full bg-gray-200 rounded-full h-2">
+            <div id="confidenceBar" class="result-meter rounded-full h-2" style="width: 0%"></div>
+          </div>
+        </div>
+      </div>
+      <div class="mt-8">
+        <h4 class="text-lg font-medium text-gray-900 dark:text-white">Recommended Action</h4>
+        <ul class="mt-2 space-y-2 text-gray-600 dark:text-gray-300" id="recommendations">
+          <!-- JS will fill this list dynamically later -->
+        </ul>
+      </div>
+    </div>
+    <div class="relative h-64 sm:h-96 lg:h-full">
+      <img id="capturedImage" class="absolute inset-0 w-full h-full object-cover" src=""
+        alt="Captured plant image">
+    </div>
+  </div>
+</div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section id="features" class="py-12 md:py-20 bg-gray-50 dark:bg-gray-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="lg:text-center">
+        <h2 class="text-base text-emerald-500 font-semibold tracking-wide uppercase">Capabilities</h2>
+        <p class="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-gray-900 dark:text-white sm:text-4xl">
+          Advanced Agricultural AI
+        </p>
+        <p class="mt-4 max-w-2xl text-xl text-gray-500 dark:text-gray-300 lg:mx-auto">
+          Comprehensive solutions for modern farming challenges.
+        </p>
+      </div>
+
+      <div class="mt-16">
+        <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+          <!-- Feature 1 -->
+          <div class="glass-card rounded-2xl p-6 text-center" data-aos="fade-up">
+            <div class="feature-icon rounded-full flex items-center justify-center mx-auto mb-4">
+              <i data-feather="activity" class="w-6 h-6 text-white"></i>
+            </div>
+            <h3 class="text-lg font-medium text-gray-900 dark:text-white">Precision Detection</h3>
+            <p class="mt-2 text-gray-500 dark:text-gray-400">
+              95% accuracy in identifying diseases across multiple crop types.
+            </p>
+          </div>
+
+          <!-- Feature 2 -->
+          <div class="glass-card rounded-2xl p-6 text-center" data-aos="fade-up" data-aos-delay="100">
+            <div class="feature-icon rounded-full flex items-center justify-center mx-auto mb-4">
+              <i data-feather="layers" class="w-6 h-6 text-white"></i>
+            </div>
+            <h3 class="text-lg font-medium text-gray-900 dark:text-white">Multi-Crop Support</h3>
+            <p class="mt-2 text-gray-500 dark:text-gray-400">
+              Tomatoes, potatoes, bell peppers, and more with continuous expansion.
+            </p>
+          </div>
+
+          <!-- Feature 3 -->
+          <div class="glass-card rounded-2xl p-6 text-center" data-aos="fade-up" data-aos-delay="200">
+            <div class="feature-icon rounded-full flex items-center justify-center mx-auto mb-4">
+              <i data-feather="package" class="w-6 h-6 text-white"></i>
+            </div>
+            <h3 class="text-lg font-medium text-gray-900 dark:text-white">Fruit Recognition</h3>
+            <p class="mt-2 text-gray-500 dark:text-gray-400">
+              Identify fruit varieties and optimal harvest times with precision.
+            </p>
+          </div>
+
+          <!-- Feature 4 -->
+          <div class="glass-card rounded-2xl p-6 text-center" data-aos="fade-up" data-aos-delay="300">
+            <div class="feature-icon rounded-full flex items-center justify-center mx-auto mb-4">
+              <i data-feather="smartphone" class="w-6 h-6 text-white"></i>
+            </div>
+            <h3 class="text-lg font-medium text-gray-900 dark:text-white">Mobile First</h3>
+            <p class="mt-2 text-gray-500 dark:text-gray-400">
+              Accessible anywhere, optimized for field use on smartphones.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Impact Section -->
+  <section id="impact" class="py-12 md:py-20 bg-white dark:bg-gray-900">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="lg:text-center">
+        <h2 class="text-base text-emerald-500 font-semibold tracking-wide uppercase">Results</h2>
+        <p class="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-gray-900 dark:text-white sm:text-4xl">
+          Transforming Agriculture
+        </p>
+        <p class="mt-4 max-w-2xl text-xl text-gray-500 dark:text-gray-300 lg:mx-auto">
+          Empowering farmers with AI-driven insights for sustainable farming.
+        </p>
+      </div>
+
+      <div class="mt-16">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden">
+          <div class="grid grid-cols-1 lg:grid-cols-2">
+            <div class="p-8 sm:p-12">
+              <h3 class="text-2xl font-bold text-gray-900 dark:text-white">Proven Impact</h3>
+              <div class="mt-8 space-y-8">
+                <div class="flex items-start">
+                  <div class="flex-shrink-0 bg-emerald-100 rounded-lg p-3">
+                    <i data-feather="trending-up" class="w-6 h-6 text-emerald-600"></i>
+                  </div>
+                  <div class="ml-4">
+                    <h4 class="text-lg font-medium text-gray-900 dark:text-white">30-50% Reduction in Crop Loss</h4>
+                    <p class="mt-1 text-gray-600 dark:text-gray-300">
+                      Early detection prevents disease spread, saving harvests.
+                    </p>
+                  </div>
+                </div>
+                <div class="flex items-start">
+                  <div class="flex-shrink-0 bg-emerald-100 rounded-lg p-3">
+                    <i data-feather="dollar-sign" class="w-6 h-6 text-emerald-600"></i>
+                  </div>
+                  <div class="ml-4">
+                    <h4 class="text-lg font-medium text-gray-900 dark:text-white">20% Increase in Farmer Income</h4>
+                    <p class="mt-1 text-gray-600 dark:text-gray-300">
+                      Healthier crops command better market prices.
+                    </p>
+                  </div>
+                </div>
+                <div class="flex items-start">
+                  <div class="flex-shrink-0 bg-emerald-100 rounded-lg p-3">
+                    <i data-feather="globe" class="w-6 h-6 text-emerald-600"></i>
+                  </div>
+                  <div class="ml-4">
+                    <h4 class="text-lg font-medium text-gray-900 dark:text-white">Sustainable Practices</h4>
+                    <p class="mt-1 text-gray-600 dark:text-gray-300">
+                      Targeted treatment reduces chemical usage by up to 40%.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="relative h-64 sm:h-96 lg:h-full">
+              <img class="absolute inset-0 w-full h-full object-cover"
+                src="https://vodenglish.news/wp-content/uploads/2022/07/signal-2022-07-05-045019_002.jpeg"
+                alt="Farmer using LeafCure">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonials Section -->
+  <section class="py-12 md:py-20 bg-gray-50 dark:bg-gray-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="lg:text-center">
+        <h2 class="text-base text-emerald-500 font-semibold tracking-wide uppercase">Validation</h2>
+        <p class="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-gray-900 dark:text-white sm:text-4xl">
+          Trusted by Agricultural Leaders
+        </p>
+      </div>
+
+      <div class="mt-16">
+        <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+          <!-- Testimonial 1 -->
+          <div class="glass-card rounded-2xl p-8" data-aos="fade-up">
+            <div class="flex items-center">
+              <div class="flex-shrink-0">
+                <img class="h-12 w-12 rounded-full" src="https://randomuser.me/api/portraits/women/44.jpg"
+                  alt="AgriTech Researcher">
+              </div>
+              <div class="ml-4">
+                <h3 class="text-lg font-medium text-gray-900 dark:text-white">Dr. Sarah Chen</h3>
+                <p class="text-gray-500 dark:text-gray-400">AgriTech Researcher</p>
+              </div>
+            </div>
+            <p class="mt-4 text-gray-600 dark:text-gray-300">
+              "LeafCure represents a revolutionary tool for modern agriculture. The accuracy and speed of their AI
+              models are unmatched in the industry."
+            </p>
+          </div>
+
+          <!-- Testimonial 2 -->
+          <div class="glass-card rounded-2xl p-8" data-aos="fade-up" data-aos-delay="100">
+            <div class="flex items-center">
+              <div class="flex-shrink-0">
+                <img class="h-12 w-12 rounded-full" src="https://randomuser.me/api/portraits/men/32.jpg" alt="Farm Owner">
+              </div>
+              <div class="ml-4">
+                <h3 class="text-lg font-medium text-gray-900 dark:text-white">Miguel Rodriguez</h3>
+                <p class="text-gray-500 dark:text-gray-400">Organic Farm Owner</p>
+              </div>
+            </div>
+            <p class="mt-4 text-gray-600 dark:text-gray-300">
+              "Since implementing LeafCure, we've reduced crop losses by 40% while cutting pesticide use. It's
+              transformed how we manage plant health."
+            </p>
+          </div>
+
+          <!-- Testimonial 3 -->
+          <div class="glass-card rounded-2xl p-8" data-aos="fade-up" data-aos-delay="200">
+            <div class="flex items-center">
+              <div class="flex-shrink-0">
+                <img class="h-12 w-12 rounded-full" src="https://randomuser.me/api/portraits/men/75.jpg"
+                  alt="Agricultural Investor">
+              </div>
+              <div class="ml-4">
+                <h3 class="text-lg font-medium text-gray-900 dark:text-white">James Wilson</h3>
+                <p class="text-gray-500 dark:text-gray-400">Agricultural Investor</p>
+              </div>
+            </div>
+            <p class="mt-4 text-gray-600 dark:text-gray-300">
+              "LeafCure's scalable AI technology addresses a critical need in global agriculture. The market potential
+              is enormous as farmers adopt precision tools."
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact Section -->
+  <section id="contact" class="py-12 md:py-20 bg-white dark:bg-gray-900">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="bg-gradient-to-r from-emerald-500 to-blue-500 rounded-2xl shadow-xl overflow-hidden">
+        <div class="grid grid-cols-1 lg:grid-cols-2">
+          <div class="p-8 sm:p-12">
+            <h2 class="text-2xl font-bold text-white">Partner with Us</h2>
+            <p class="mt-4 text-emerald-100">
+              Whether you're a farmer, researcher, or investor, we'd love to explore how LeafCure can work for you.
+            </p>
+            <form id="contactForm" class="mt-8 space-y-6">
+              <div>
+                <label for="name" class="sr-only">Full name</label>
+                <input id="name" name="name" type="text" required
+                  class="w-full px-5 py-3 placeholder-gray-500 focus:ring-emerald-500 focus:border-emerald-500 sm:text-sm border-gray-300 rounded-full"
+                  placeholder="Full name">
+              </div>
+              <div>
+                <label for="email" class="sr-only">Email</label>
+                <input id="email" name="email" type="email" autocomplete="email" required
+                  class="w-full px-5 py-3 placeholder-gray-500 focus:ring-emerald-500 focus:border-emerald-500 sm:text-sm border-gray-300 rounded-full"
+                  placeholder="Email">
+              </div>
+              <div>
+                <label for="interest" class="sr-only">Interest</label>
+                <select id="interest" name="interest"
+                  class="w-full px-5 py-3 placeholder-gray-500 focus:ring-emerald-500 focus:border-emerald-500 sm:text-sm border-gray-300 rounded-full">
+                  <option>I'm a farmer</option>
+                  <option>I'm a researcher</option>
+                  <option>I'm an investor</option>
+                  <option>Other</option>
+                </select>
+              </div>
+              <div>
+                <button type="submit"
+                  class="w-full flex justify-center items-center px-5 py-3 border border-transparent text-base font-medium rounded-full shadow-sm text-emerald-600 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white transition duration-300">
+                  Request Demo
+                  <i data-feather="arrow-right" class="ml-2 w-4 h-4"></i>
+                </button>
+              </div>
+            </form>
+          </div>
+          <div class="relative h-64 sm:h-96 lg:h-full">
+            <img class="absolute inset-0 w-full h-full object-cover" src="https://images.unsplash.com/photo-1500382014538-906b785073a6?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80"
+              alt="Farm field at sunset">
+            <div class="absolute inset-0 bg-gradient-to-t from-emerald-500/20 via-emerald-500/10 to-transparent"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Theme Toggle Button -->
+  <button id="themeToggle"
+    class="fixed bottom-6 right-6 z-50 p-3 rounded-full bg-emerald-500 text-white shadow-lg hover:bg-emerald-600 transition-all">
+    <i data-feather="moon" class="hidden dark:block"></i>
+    <i data-feather="sun" class="dark:hidden"></i>
+  </button>
+
+  <!-- Footer -->
+  <footer class="bg-[var(--card-bg)] border-t border-[var(--border-color)]">
+    <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+        <div class="col-span-2">
+          <div class="flex items-center">
+            <i data-feather="leaf" class="text-emerald-500 w-8 h-8"></i>
+            <span class="ml-2 text-xl font-bold">LeafCure</span>
+          </div>
+          <p class="mt-4 text-gray-500 dark:text-gray-400 text-sm">
+            AI-powered plant disease detection and fruit classification for sustainable agriculture.
+          </p>
+        </div>
+        <div>
+          <h3 class="text-sm font-semibold text-gray-900 dark:text-white tracking-wider uppercase">Product</h3>
+          <ul class="mt-4 space-y-2">
+            <li><a href="#how-it-works"
+                class="text-gray-500 hover:text-emerald-500 dark:hover:text-blue-400 text-sm transition-colors">How It
+                Works</a></li>
+            <li><a href="#features"
+                class="text-gray-500 hover:text-emerald-500 dark:hover:text-blue-400 text-sm transition-colors">Features</a>
+            </li>
+            <li><a href="#technology"
+                class="text-gray-500 hover:text-emerald-500 dark:hover:text-blue-400 text-sm transition-colors">Technology</a>
+            </li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="text-sm font-semibold text-gray-900 dark:text-white tracking-wider uppercase">Company</h3>
+          <ul class="mt-4 space-y-2">
+            <li><a href="#impact"
+                class="text-gray-500 hover:text-emerald-500 dark:hover:text-blue-400 text-sm transition-colors">Impact</a>
+            </li>
+            <li><a href="#contact"
+                class="text-gray-500 hover:text-emerald-500 dark:hover:text-blue-400 text-sm transition-colors">Contact</a>
+            </li>
+            <li><a href="#"
+                class="text-gray-500 hover:text-emerald-500 dark:hover:text-blue-400 text-sm transition-colors">Careers</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div class="mt-12 border-t border-gray-200 dark:border-gray-700 pt-8 flex flex-col md:flex-row justify-between">
+        <p class="text-gray-500 dark:text-gray-400 text-sm">
+          &copy; 2023 LeafCure. All rights reserved.
+        </p>
+        <div class="mt-4 md:mt-0 flex space-x-6">
+          <a href="#" class="text-gray-500 hover:text-emerald-500 dark:hover:text-blue-400 transition-colors">
+            <i data-feather="twitter" class="w-5 h-5"></i>
+          </a>
+          <a href="#" class="text-gray-500 hover:text-emerald-500 dark:hover:text-blue-400 transition-colors">
+            <i data-feather="facebook" class="w-5 h-5"></i>
+          </a>
+          <a href="#" class="text-gray-500 hover:text-emerald-500 dark:hover:text-blue-400 transition-colors">
+            <i data-feather="linkedin" class="w-5 h-5"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    
+  // ==============================
+  // Initialize animations & theme
+  // ==============================
+  AOS.init({ duration: 800, easing: 'ease-in-out', once: true });
+  feather.replace();
+
+  const themeToggle = document.getElementById('themeToggle');
+  const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+  const currentTheme = localStorage.getItem('theme');
+
+  if (currentTheme === 'dark' || (!currentTheme && prefersDarkScheme.matches)) {
+    document.body.classList.add('dark');
+  } else {
+    document.body.classList.add('light');
+  }
+
+  themeToggle.addEventListener('click', () => {
+    document.body.classList.toggle('dark');
+    document.body.classList.toggle('light');
+    localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light');
+    feather.replace();
+  });
+
+  // ==============================
+  // Mobile menu
+  // ==============================
+  const mobileMenuButton = document.getElementById('mobileMenuButton');
+  const mobileMenu = document.getElementById('mobileMenu');
+  mobileMenuButton.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
+  document.querySelectorAll('#mobileMenu a').forEach(link => {
+    link.addEventListener('click', () => mobileMenu.classList.add('hidden'));
+  });
+
+  // ==============================
+  // Elements
+  // ==============================
+  const uploadBtn = document.getElementById('uploadBtn');
+  const fileInput = document.getElementById('fileInput');
+  const openCameraBtn = document.getElementById('openCameraBtn');
+  const cameraModal = document.getElementById('cameraModal');
+  const closeCameraBtn = document.querySelector('.close-btn');
+  const video = document.getElementById('video');
+  const captureBtn = document.getElementById('captureBtn');
+  const resultDisplay = document.getElementById('resultDisplay');
+  const capturedImage = document.getElementById('capturedImage');
+
+  const resultCrop = document.getElementById("resultCrop");
+  const resultDisease = document.getElementById("resultDisease");
+  const confidencePercent = document.getElementById("confidencePercent");
+  const confidenceBar = document.getElementById("confidenceBar");
+
+  // ==============================
+  // Helper: Send image to backend
+  // ==============================
+  async function analyzeImage(file) {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const response = await fetch("/predict", {
+        method: "POST",
+        body: formData
+      });
+      const data = await response.json();
+
+      if (data.error) {
+        alert(data.error);
+        return;
+      }
+
+      // Update UI
+      resultCrop.textContent = `Crop: ${data.crop}`;
+      resultDisease.textContent = `Disease: ${data.disease}`;
+
+      // Confidence animation (fake ~90%)
+      let width = 0;
+      confidenceBar.style.width = "0%";
+      const interval = setInterval(() => {
+        width += 5;
+        confidenceBar.style.width = `${width}%`;
+        confidencePercent.textContent = `${width}%`;
+        if (width >= 90) clearInterval(interval);
+      }, 50);
+
+      resultDisplay.classList.remove("hidden");
+      resultDisplay.scrollIntoView({ behavior: "smooth" });
+
+    } catch (err) {
+      console.error("Prediction error:", err);
+      alert("Something went wrong during analysis.");
+    }
+  }
+
+  // ==============================
+  // File upload handler
+  // ==============================
+  fileInput.addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // Preview image
+    const reader = new FileReader();
+    reader.onload = (event) => { capturedImage.src = event.target.result; };
+    reader.readAsDataURL(file);
+
+    // Send to backend
+    await analyzeImage(file);
+  });
+
+  // ==============================
+  // Camera modal handlers
+  // ==============================
+  openCameraBtn.addEventListener('click', async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      video.srcObject = stream;
+      cameraModal.style.display = "block";
+    } catch (err) {
+      console.error("Error accessing camera:", err);
+      alert("Could not access the camera. Please check permissions.");
+    }
+  });
+
+  closeCameraBtn.addEventListener('click', () => {
+    if (video.srcObject) video.srcObject.getTracks().forEach(track => track.stop());
+    cameraModal.style.display = "none";
+  });
+
+  window.addEventListener('click', (event) => {
+    if (event.target == cameraModal) {
+      if (video.srcObject) video.srcObject.getTracks().forEach(track => track.stop());
+      cameraModal.style.display = "none";
+    }
+  });
+
+  captureBtn.addEventListener('click', async () => {
+    // Capture frame into canvas
+    const canvas = document.createElement('canvas');
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+
+    // Stop camera
+    if (video.srcObject) video.srcObject.getTracks().forEach(track => track.stop());
+    cameraModal.style.display = "none";
+
+    // Convert canvas to blob
+    canvas.toBlob(async (blob) => {
+      capturedImage.src = canvas.toDataURL('image/jpeg');
+      await analyzeImage(blob);
+    }, "image/jpeg");
+  });
+
+  // ==============================
+  // Contact form
+  // ==============================
+  const contactForm = document.getElementById('contactForm');
+  contactForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    alert('Thank you for your interest! We will contact you soon.');
+    contactForm.reset();
+  });
+
+  </script>
+</body>
+
+</html>
